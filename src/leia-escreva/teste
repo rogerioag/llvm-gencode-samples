@@ -1,0 +1,161 @@
+	.text
+	.file	"meu_modulo-linked.bc"
+	.globl	main
+	.align	16, 0x90
+	.type	main,@function
+main:                                   # @main
+	.cfi_startproc
+# BB#0:                                 # %entry
+	subq	$24, %rsp
+.Ltmp0:
+	.cfi_def_cfa_offset 32
+	movq	$0, 16(%rsp)
+	callq	leiaInteiro
+	movl	%eax, 12(%rsp)
+	callq	leiaFlutuante
+	movss	%xmm0, 8(%rsp)
+	movl	12(%rsp), %edi
+	callq	escrevaInteiro
+	movss	8(%rsp), %xmm0
+	callq	escrevaFlutuante
+	movq	16(%rsp), %rax
+	addq	$24, %rsp
+	retq
+.Ltmp1:
+	.size	main, .Ltmp1-main
+	.cfi_endproc
+
+	.globl	escrevaInteiro
+	.align	16, 0x90
+	.type	escrevaInteiro,@function
+escrevaInteiro:                         # @escrevaInteiro
+	.cfi_startproc
+# BB#0:
+	pushq	%rbp
+.Ltmp2:
+	.cfi_def_cfa_offset 16
+.Ltmp3:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+.Ltmp4:
+	.cfi_def_cfa_register %rbp
+	subq	$16, %rsp
+	movl	%edi, %ecx
+	movl	%ecx, -4(%rbp)
+	movl	$.L.str, %edi
+	xorl	%eax, %eax
+	movl	%ecx, %esi
+	callq	printf
+	addq	$16, %rsp
+	popq	%rbp
+	retq
+.Ltmp5:
+	.size	escrevaInteiro, .Ltmp5-escrevaInteiro
+	.cfi_endproc
+
+	.globl	escrevaFlutuante
+	.align	16, 0x90
+	.type	escrevaFlutuante,@function
+escrevaFlutuante:                       # @escrevaFlutuante
+	.cfi_startproc
+# BB#0:
+	pushq	%rbp
+.Ltmp6:
+	.cfi_def_cfa_offset 16
+.Ltmp7:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+.Ltmp8:
+	.cfi_def_cfa_register %rbp
+	subq	$16, %rsp
+	movss	%xmm0, -4(%rbp)
+	movss	-4(%rbp), %xmm0
+	cvtss2sd	%xmm0, %xmm0
+	movl	$.L.str1, %edi
+	movb	$1, %al
+	callq	printf
+	addq	$16, %rsp
+	popq	%rbp
+	retq
+.Ltmp9:
+	.size	escrevaFlutuante, .Ltmp9-escrevaFlutuante
+	.cfi_endproc
+
+	.globl	leiaInteiro
+	.align	16, 0x90
+	.type	leiaInteiro,@function
+leiaInteiro:                            # @leiaInteiro
+	.cfi_startproc
+# BB#0:
+	pushq	%rbp
+.Ltmp10:
+	.cfi_def_cfa_offset 16
+.Ltmp11:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+.Ltmp12:
+	.cfi_def_cfa_register %rbp
+	subq	$16, %rsp
+	leaq	-4(%rbp), %rsi
+	movl	$.L.str2, %edi
+	xorl	%eax, %eax
+	callq	__isoc99_scanf
+	movl	-4(%rbp), %eax
+	addq	$16, %rsp
+	popq	%rbp
+	retq
+.Ltmp13:
+	.size	leiaInteiro, .Ltmp13-leiaInteiro
+	.cfi_endproc
+
+	.globl	leiaFlutuante
+	.align	16, 0x90
+	.type	leiaFlutuante,@function
+leiaFlutuante:                          # @leiaFlutuante
+	.cfi_startproc
+# BB#0:
+	pushq	%rbp
+.Ltmp14:
+	.cfi_def_cfa_offset 16
+.Ltmp15:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+.Ltmp16:
+	.cfi_def_cfa_register %rbp
+	subq	$16, %rsp
+	leaq	-4(%rbp), %rsi
+	movl	$.L.str3, %edi
+	xorl	%eax, %eax
+	callq	__isoc99_scanf
+	movss	-4(%rbp), %xmm0
+	addq	$16, %rsp
+	popq	%rbp
+	retq
+.Ltmp17:
+	.size	leiaFlutuante, .Ltmp17-leiaFlutuante
+	.cfi_endproc
+
+	.type	.L.str,@object          # @.str
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.L.str:
+	.asciz	"%d\n"
+	.size	.L.str, 4
+
+	.type	.L.str1,@object         # @.str1
+.L.str1:
+	.asciz	"%f\n"
+	.size	.L.str1, 4
+
+	.type	.L.str2,@object         # @.str2
+.L.str2:
+	.asciz	"%d"
+	.size	.L.str2, 3
+
+	.type	.L.str3,@object         # @.str3
+.L.str3:
+	.asciz	"%f"
+	.size	.L.str3, 3
+
+
+	.ident	"Debian clang version 3.5.0-10 (tags/RELEASE_350/final) (based on LLVM 3.5.0)"
+	.section	".note.GNU-stack","",@progbits
