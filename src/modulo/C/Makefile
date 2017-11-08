@@ -26,5 +26,5 @@ out-o1.ll: out.ll
 	$(OPT) -S -O1 <out.ll >out-o1.ll
 
 clean:
-	rm -rvf modulo.o modulo out*.ll
+	rm -rvf modulo.o modulo out*.ll *.bc
 
