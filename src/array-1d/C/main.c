@@ -33,8 +33,6 @@ int main(int argc, char *argv[]) {
 
   LLVMSetInitializer(arrayA, LLVMConstInt(LLVMIntType(64), 0, false));
 
-  globalData.getInitializer()->getType()
-
   // common.
   LLVMSetLinkage(arrayA, LLVMCommonLinkage);
   // Alignment.

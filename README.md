@@ -1,6 +1,12 @@
 # llvm-gencode-samples
 
-* Repositório de exemplos de geração de código LLVM-IR utilizando LLVM C API e llvmlite (python).
+* Repositório de exemplos de geração de código `LLVM-IR` utilizando `LLVM C API` e `llvmlite` (Python).
+* Implementações: 
+	+ **Ref**: De referência exemplo escrito em `C` compilado com o `clang`.
+	+ **C**: Implementação utilizando `LLVM C API`.
+	+ **Python**: Implementação utilizando `llvmlite`
+
+* Exemplos:
 
 + [Criação de Módulo](src/modulo)
     - [Ref](src/modulo/ref)
