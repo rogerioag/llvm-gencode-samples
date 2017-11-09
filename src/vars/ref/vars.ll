@@ -3,26 +3,25 @@ target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
 @g = common global i32 0, align 4
+@h = common global float 0.000000e+00, align 4
 
 ; Function Attrs: nounwind uwtable
 define i32 @main() #0 {
   %1 = alloca i32, align 4
   %a = alloca i32, align 4
   %b = alloca float, align 4
-  %c = alloca float, align 4
   store i32 0, i32* %1
   store i32 1, i32* %a, align 4
   store float 1.000000e+00, float* %b, align 4
-  store float 2.000000e+00, float* %c, align 4
   store i32 10, i32* @g, align 4
+  store float 1.000000e+01, float* @h, align 4
   %2 = load i32* %a, align 4
-  %3 = load i32* %a, align 4
-  %4 = add nsw i32 %2, %3
-  store i32 %4, i32* %a, align 4
-  %5 = load float* %b, align 4
-  %6 = load float* %c, align 4
-  %7 = fadd float %5, %6
-  store float %7, float* %b, align 4
+  %3 = add nsw i32 %2, 10
+  store i32 %3, i32* %a, align 4
+  %4 = load float* %b, align 4
+  %5 = load float* @h, align 4
+  %6 = fadd float %4, %5
+  store float %6, float* %b, align 4
   ret i32 0
 }
 
