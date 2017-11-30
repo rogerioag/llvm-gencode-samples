@@ -11,10 +11,10 @@ int main(int argc, char *argv[]) {
   LLVMBuilderRef builder = LLVMCreateBuilderInContext(context);
 
   // Cria um valor zero para colocar no retorno.
-  LLVMValueRef Zero64 = LLVMConstInt(LLVMInt64Type(), 0, false);
+  LLVMValueRef Zero = LLVMConstInt(LLVMIntType(32), 0, false);
 
   // Declara o tipo do retorno da função main.
-  LLVMTypeRef mainFnReturnType = LLVMInt64TypeInContext(context);
+  LLVMTypeRef mainFnReturnType = LLVMInt32TypeInContext(context);
   // Cria a função main.
   LLVMValueRef mainFn = LLVMAddFunction(
       module, "main", LLVMFunctionType(mainFnReturnType, NULL, 0, 0));
@@ -39,14 +39,14 @@ int main(int argc, char *argv[]) {
   LLVMPositionBuilderAtEnd(builder, entryBlock);
 
   // Cria o valor de retorno e inicializa com zero.
-  LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMInt64Type(), "retorno");
-  LLVMBuildStore(builder, Zero64, returnVal);
+  LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMIntType(32), "retorno");
+  LLVMBuildStore(builder, Zero, returnVal);
 
   // Declara uma variável n.
-  LLVMValueRef n = LLVMBuildAlloca(builder, LLVMInt64Type(), "n");
+  LLVMValueRef n = LLVMBuildAlloca(builder, LLVMIntType(32), "n");
 
   // Inicializa n.
-  LLVMBuildStore(builder, LLVMConstInt(LLVMInt64Type(), 10, false), n);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 10, false), n);
   LLVMBuildBr(builder, predicateBlock);
 
   // Bloco de predicado.
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   
   // Comparacao de n < 1024.
   LLVMValueRef n_cmp = LLVMBuildLoad(builder, n, "n");
-  LLVMValueRef cmpVal = LLVMBuildICmp(builder, LLVMIntSLT, n_cmp, LLVMConstInt(LLVMInt64Type(), 1024, false), "if_test");
+  LLVMValueRef cmpVal = LLVMBuildICmp(builder, LLVMIntSLT, n_cmp, LLVMConstInt(LLVMIntType(32), 1024, false), "if_test");
 
   // Teste di if.
   LLVMBuildCondBr(builder, cmpVal, thenBlock, elseBlock);

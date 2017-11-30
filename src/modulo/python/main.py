@@ -12,7 +12,7 @@ Será gerado um código em LLVM como este em C:
 module = ir.Module('meu_modulo.bc')
 
 
-
+# Salva o Módulo.
 arquivo = open('meu_modulo.ll', 'w')
 arquivo.write(str(module))
 arquivo.close()

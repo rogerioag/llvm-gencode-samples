@@ -5,7 +5,6 @@ int main(){
 	int b = 2;
 	int c = 0;
 
-
 	if(a < b) {
 		c = 5; 
 	}

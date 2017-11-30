@@ -4,63 +4,127 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/BitWriter.h>
 
+/*
+int main(){
+
+  int a = 1;
+  int b = 2;
+  int c = 0;
+
+  if(a < b) {
+    c = 5; 
+  }
+  else {
+    c = 6;
+  }
+
+  if(a < 1024){
+    c = 10;
+  }
+  else {
+    c = 20;
+  }
+  
+  return 0;
+}
+*/
+
 int main(int argc, char *argv[]) {
   LLVMContextRef context = LLVMGetGlobalContext();
   LLVMModuleRef module = LLVMModuleCreateWithNameInContext("meu_modulo", context);
   LLVMBuilderRef builder = LLVMCreateBuilderInContext(context);
 
   // Cria um valor zero para colocar no retorno.
-  LLVMValueRef Zero64 = LLVMConstInt(LLVMInt64Type(), 0, false);
+  LLVMValueRef Zero = LLVMConstInt(LLVMIntType(32), 0, false);
 
   // Declara o tipo do retorno da função main.
-  LLVMTypeRef mainFnReturnType = LLVMInt64TypeInContext(context);
+  LLVMTypeRef mainFnReturnType = LLVMInt32TypeInContext(context);
   // Cria a função main.
   LLVMValueRef mainFn = LLVMAddFunction(module, "main", LLVMFunctionType(mainFnReturnType, NULL, 0, 0));
 
   // Declara o bloco de entrada.
   LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(context, mainFn, "entry");
   // Declara o bloco de saída.
-  LLVMBasicBlockRef endBasicBlock = LLVMAppendBasicBlock(mainFn, "end");
+  LLVMBasicBlockRef exitBasicBlock = LLVMAppendBasicBlock(mainFn, "exit");
 
   // Adiciona o bloco de entrada.
   LLVMPositionBuilderAtEnd(builder, entryBlock);
 
   // Cria o valor de retorno e inicializa com zero.
-  LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMInt64Type(), "retorno");
-	LLVMBuildStore(builder, Zero64, returnVal);
+  LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMIntType(32), "retorno");
+	LLVMBuildStore(builder, Zero, returnVal);
 
-  // Declara uma variável n.
-  LLVMValueRef n = LLVMBuildAlloca(builder, LLVMInt64Type(), "n");
+  // Declara as variáveis a, b, e c.
+  LLVMValueRef a = LLVMBuildAlloca(builder, LLVMIntType(32), "a");
+  LLVMValueRef b = LLVMBuildAlloca(builder, LLVMIntType(32), "b");
+  LLVMValueRef c = LLVMBuildAlloca(builder, LLVMIntType(32), "c");
   
-  // Inicializa n.
-  LLVMBuildStore(builder, LLVMConstInt(LLVMInt64Type(), 10, false), n);
+  // Inicializa as variáveis.
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 1, false), a);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 2, false), b);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 0, false), c);
 
+  // Declara os blocos básicos para o primeiro if.
+  // if(a < b) {
+  //  c = 5; 
+  // }
+  // else {
+  //   c = 6;
+  // }
+  LLVMBasicBlockRef iftrue_1 = LLVMAppendBasicBlock(mainFn, "iftrue_1");
+  LLVMBasicBlockRef iffalse_1 = LLVMAppendBasicBlock(mainFn, "iffalse_1");
+  LLVMBasicBlockRef ifend_1 = LLVMAppendBasicBlock(mainFn, "ifend_1");
+
+  // Carrega as variáveis a e b para comparação.
+  LLVMValueRef a_cmp = LLVMBuildLoad(builder, a, "a_cmp");
+  LLVMValueRef b_cmp = LLVMBuildLoad(builder, b, "b_cmp");
+
+  LLVMValueRef If_1 = LLVMBuildICmp(builder, LLVMIntSLT, a_cmp, b_cmp, "if_test_1");
+  LLVMBuildCondBr(builder, If_1, iftrue_1, iffalse_1);
+
+  LLVMPositionBuilderAtEnd(builder, iftrue_1);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 5, 0), c);
+  LLVMBuildBr(builder, ifend_1);
+
+  LLVMPositionBuilderAtEnd(builder, iffalse_1);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 6, 0), c);
+  LLVMBuildBr(builder, ifend_1);
+
+  LLVMPositionBuilderAtEnd(builder, ifend_1);
+
+  // Segundo If.
+  // if(a < 1024){
+  //   c = 10;
+  // }
+  // else {
+  //   c = 20;
+  // }
   // Declara os blocos básicos para o if.
-	LLVMBasicBlockRef iftrue = LLVMAppendBasicBlock(mainFn, "iftrue");
-  LLVMBasicBlockRef iffalse = LLVMAppendBasicBlock(mainFn, "iffalse");
-  LLVMBasicBlockRef ifend = LLVMAppendBasicBlock(mainFn, "ifend");
+	LLVMBasicBlockRef iftrue_2 = LLVMAppendBasicBlock(mainFn, "iftrue_2");
+  LLVMBasicBlockRef iffalse_2 = LLVMAppendBasicBlock(mainFn, "iffalse_2");
+  LLVMBasicBlockRef ifend_2 = LLVMAppendBasicBlock(mainFn, "ifend_2");
   
-  // Carrega o valor que será comparado: n < 1024.
-  LLVMValueRef n_cmp = LLVMBuildLoad(builder, n, "n");
+  // Carrega o valor que será comparado: a < 1024.
+  LLVMValueRef a_cmp_2 = LLVMBuildLoad(builder, a, "a");
 
-  LLVMValueRef If = LLVMBuildICmp(builder, LLVMIntSLT, n_cmp, LLVMConstInt(LLVMInt64Type(), 1024, false), "if_test");
-  LLVMBuildCondBr(builder, If, iftrue, iffalse);
+  LLVMValueRef If_2 = LLVMBuildICmp(builder, LLVMIntSLT, a_cmp_2, LLVMConstInt(LLVMIntType(32), 1024, false), "if_test_2");
+  LLVMBuildCondBr(builder, If_2, iftrue_2, iffalse_2);
 
-  LLVMPositionBuilderAtEnd(builder, iftrue);
-  LLVMBuildStore(builder, LLVMConstInt(LLVMInt64Type(), 1, 0), returnVal);
-  LLVMBuildBr(builder, ifend);
+  LLVMPositionBuilderAtEnd(builder, iftrue_2);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 10, 0), c);
+  LLVMBuildBr(builder, ifend_2);
 
-  LLVMPositionBuilderAtEnd(builder, iffalse);
-  LLVMBuildStore(builder, LLVMConstInt(LLVMInt64Type(), 2, 0), returnVal);
-  LLVMBuildBr(builder, ifend);
+  LLVMPositionBuilderAtEnd(builder, iffalse_2);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 20, 0), c);
+  LLVMBuildBr(builder, ifend_2);
 
-  LLVMPositionBuilderAtEnd(builder, ifend);
+  LLVMPositionBuilderAtEnd(builder, ifend_2);
 
   // Cria um salto para o bloco de saída.
-	LLVMBuildBr(builder, endBasicBlock);
+	LLVMBuildBr(builder, exitBasicBlock);
 	
 	// Adiciona o bloco de saída.
-	LLVMPositionBuilderAtEnd(builder, endBasicBlock);
+	LLVMPositionBuilderAtEnd(builder, exitBasicBlock);
   
   // Cria o return.
 	LLVMBuildRet(builder, LLVMBuildLoad(builder, returnVal, ""));
