@@ -42,6 +42,11 @@
     - [Ref](src/call-function/ref)
     - [C](src/call-function/C)
     - [Python](src/call-function/python)
+
+    + [Function Parameters](src/params)
+    - [Ref](src/params/ref)
+    - [C](src/params/C)
+    - [Python](src/params/python)
   
   + [Call External Function](src/call-external-function)
     - [Ref](src/call-external-function/ref)
