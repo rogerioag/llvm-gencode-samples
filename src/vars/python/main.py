@@ -36,7 +36,6 @@ g.linkage = "common"
 # Define o alinhamento em 4
 g.align = 4
 
-
 # Variável float global h
 h = ir.GlobalVariable(module, ir.FloatType(),"h")
 # Inicializa a variavel h
@@ -45,8 +44,6 @@ h.initializer =  ir.Constant(ir.FloatType(), 0.0)
 h.linkage = "common"
 # Define o alinhamento em 4
 h.align = 4
-
-
 
 # Define o retorno da função main
 Zero32 = ir.Constant(ir.IntType(32), 0)
