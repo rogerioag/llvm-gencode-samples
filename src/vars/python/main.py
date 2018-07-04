@@ -4,7 +4,7 @@
 from llvmlite import ir
 
 '''
-Este módulo contém uma função main, declarações de variáveis, operações e atribuições
+Este módulo contém declarações de variáveis, operações e atribuições
 Será gerado um código em LLVM como este em C:
 
 int g;
@@ -13,112 +13,111 @@ float h;
 int main(){
   int a = 1;
   float b = 1.0;
-  
+
   g = 10;
   h = 10.0;
   a = a + 10;
   b = b + h;
-  
+
   return 0;
 }
 
 '''
 
-# Cria o módulo.
-module = ir.Module('meu_modulo.bc')
 
-# Variável inteira global g
-g = ir.GlobalVariable(module, ir.IntType(32),"g")
-# Inicializa a variavel g
-g.initializer = ir.Constant(ir.IntType(32), 0)
-# Linkage = common
-g.linkage = "common"
-# Define o alinhamento em 4
-g.align = 4
+def declara_e_atribui(name: str, _type: ir.Type, value) -> ir.AllocaInstr:
+    global bloco
 
-# Variável float global h
-h = ir.GlobalVariable(module, ir.FloatType(),"h")
-# Inicializa a variavel h
-h.initializer =  ir.Constant(ir.FloatType(), 0.0)
-# Linkage = common
-h.linkage = "common"
-# Define o alinhamento em 4
-h.align = 4
+    temp = bloco.alloca(_type, name=name)
 
-# Define o retorno da função main
-Zero32 = ir.Constant(ir.IntType(32), 0)
-# Cria função main
-t_func_main = ir.FunctionType(ir.IntType(32), ())
-# Declara função main
-main = ir.Function(module, t_func_main, name='main')
+    # Define o alinhamento de 4 bytes
+    temp.align = 4
 
-# Declara o bloco de entrada
-entryBlock = main.append_basic_block('entry')
-endBasicBlock = main.append_basic_block('exit')
+    # Cria uma constante pra armazenar o valor passado
+    constant = ir.Constant(_type, value)
 
-# Adiciona o bloco de entrada
-builder = ir.IRBuilder(entryBlock)
+    # Armazena a constante na variável criada
+    bloco.store(constant, temp)
 
-# Cria o valor de retorno e inicializa com zero
-returnVal = builder.alloca(ir.IntType(32), name='retorno')
-builder.store(Zero32, returnVal)
+    return temp
 
-# int a = 1;
-# float b = 1.0
 
-# Variável inteira 'a'
-# Aloca na memória variável a do tipo inteiro com nome 'a'
-a = builder.alloca(ir.IntType(32), name="a")
-# Define o alinhamento
-a.align = 4
-# Cria uma constante pra armazenar o numero 1
-num1 = ir.Constant(ir.IntType(32),1)
-# Armazena o 1 na variave 'a'
-builder.store(num1, a)
+def declara_global(name: str, _type: ir.Type, value) -> ir.GlobalValue:
+    global modulo
 
-# Variavel float b
-# Aloca na memoria 
-b = builder.alloca(ir.FloatType(), name="b")
-# Define o alinhamento
-b.align = 4
-# Cria uma constante pra armazenar o numero 1
-num1Float = ir.Constant(ir.FloatType(), 1.0)
-# Armazena o 1.0 na variavel 'b'
-builder.store(num1Float, b)
+    # Declara variável global do tipo especificado
+    temp = ir.GlobalVariable(modulo, _type, name)
 
-# g = 10
-# Outra maneira de fazer o store (sem precisar criar constante pra armazenar numero)
-builder.store( ir.Constant(ir.IntType(32), 10) , g )
+    # Inicializa variável
+    temp.initializer = ir.Constant(_type, value)
 
-# h = 10.0
-builder.store( ir.Constant(ir.FloatType(), 10.0) , h )
+    # Define alinhamento de 4 bytes
+    temp.align = 4
 
-# a = a + 10
-a_temp = builder.load(a, "")
-num10 = ir.Constant(ir.IntType(32), 10)
-temp = builder.add(a_temp, num10, name='temp', flags=())
-# Armazena o temp (a + 10) no a
-builder.store(temp, a)
+    return temp
 
-# b = b + h
-b_temp = builder.load(b, "")
-h_temp = builder.load(h,"")
-temp2 = builder.fadd( b_temp , h_temp , name='temp2', flags=())
-# Armazena temp2 em b
-builder.store(temp2, b)
 
-# Cria um salto para o bloco de saída
-builder.branch(endBasicBlock)
+if __name__ == '__main__':
+    # Cria o módulo.
+    modulo = ir.Module('meu_modulo.bc')
 
-# Adiciona o bloco de saida
-builder.position_at_end(endBasicBlock)
+    # Inicializa a variavel g
+    g = declara_global('g', ir.IntType(32), 0)
 
-# return 0
-# Cria o return
-returnVal_temp = builder.load(returnVal, name='', align=4)
-builder.ret(returnVal_temp)
+    # Variável float global h
+    h = declara_global('h', ir.FloatType(), 0.0)
 
-arquivo = open('vars.ll', 'w')
-arquivo.write(str(module))
-arquivo.close()
-print(module)
+    # Declaração da função 'principal', que DEVE ser usada com o nome 'main'.
+    main_type = ir.FunctionType(ir.IntType(32), [])
+    main = ir.Function(modulo, main_type, 'main')
+
+    # Cria blocos de entrada e saída
+    bloco_entrada = main.append_basic_block('bloco_entrada')
+    bloco_saida = main.append_basic_block('bloco_saida')
+
+    # Entra no bloco de entrada
+    bloco = ir.IRBuilder(bloco_entrada)
+
+    # int a = 1;
+    a = declara_e_atribui('a', ir.IntType(32), 1)
+
+    # float b = 1.0
+    b = declara_e_atribui('a', ir.FloatType(), 1.0)
+
+    # g = 10
+    # Outra maneira de fazer o store (sem precisar criar constante previamente)
+    bloco.store(ir.Constant(ir.IntType(32), 10), g)
+
+    # h = 10.0
+    bloco.store(ir.Constant(ir.FloatType(), 10.0), h)
+
+    # a = a + 10
+    a_temp = bloco.load(a, align=4)
+    num10 = ir.Constant(ir.IntType(32), 10)
+    temp = bloco.add(a_temp, num10, name='temp')
+
+    # Armazena o temp (a + 10) no a
+    bloco.store(temp, a)
+
+    # b = b + h
+    b_temp = bloco.load(b, align=4)
+    h_temp = bloco.load(h, align=4)
+    temp2 = bloco.fadd(b_temp, h_temp, name='temp2')
+
+    # Armazena temp2 em b
+    bloco.store(temp2, b)
+
+    # Salto para bloco de saída
+    bloco.branch(bloco_saida)
+
+    # Entra no bloco de saída
+    bloco = ir.IRBuilder(bloco_saida)
+
+    # Cria constante de retorno
+    retorno = ir.Constant(ir.IntType(32), 0)
+
+    # Efetua o retorno
+    bloco.ret(retorno)
+
+    with open('vars.ll', 'w') as arquivo:
+        arquivo.write(str(modulo))
