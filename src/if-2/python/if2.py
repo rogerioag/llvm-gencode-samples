@@ -82,14 +82,14 @@ a_type = TYPES.get("int")(32)
 a_name = "a"
 a_ref = builder.alloca(a_type, name=a_name)
 a_ref.align = 4
-a_ref.initializer = TYPES.get("constant")(a_type, 1)
+builder.store(TYPES.get("constant")(a_type, 1), a_ref)
 
 # int b = 2;
 b_type = TYPES.get("int")(32)
 b_name = "b"
 b_ref = builder.alloca(b_type, name=b_name)
 b_ref.align = 4
-b_ref.initializer = TYPES.get("constant")(b_type, 2)
+builder.store(TYPES.get("constant")(b_type, 2), b_ref)
 
 # int c = 0;
 c_type = TYPES.get("int")(32)
@@ -99,10 +99,14 @@ c_ref.align = 4
 c_ref.initializer = TYPES.get("constant")(c_type, 0)
 
 
+if_block = function.append_basic_block(name="if")
+builder.branch(if_block)
+builder.position_at_end(if_block)
+
 # first condition (a < b)
 cmp_type = "<"
 cmp_name = "a < b"
-first_condition = builder.icmp_signed(cmp_type, a_ref, b_ref, cmp_name)
+first_condition = builder.icmp_signed(cmp_type, builder.load(a_ref), builder.load(b_ref), cmp_name)
 
 with builder.if_else(first_condition) as (then, otherwise):
 
@@ -124,19 +128,20 @@ with builder.if_else(first_condition) as (then, otherwise):
 
 
 
+if_block = function.append_basic_block(name="if")
+builder.branch(if_block)
+builder.position_at_end(if_block)
 
-# second condition (a < b)
+# second condition (a < 1024)
 cmp_type = "<"
 cmp_name = "a < 1024"
 
 
 # constant 1024
 constant_1024 = TYPES.get("constant")(a_type, 1024)
-constant_1024_temp = builder.alloca(a_type, name="1024_temp")
-constant_1024_temp.initializer = constant_1024
 
 second_condition = builder.icmp_signed(
-    cmp_type, a_ref, constant_1024_temp, cmp_name)
+    cmp_type, builder.load(a_ref), constant_1024, cmp_name)
 
 
 with builder.if_else(second_condition) as (then, otherwise):
