@@ -2,7 +2,7 @@ import llvmlite
 from llvmlite import ir
 
 '''
-Este módulo contém uma função main e criação de um array unidimensional como variável global e outro como local.
+Função .
 Será gerado um código em LLVM como este em C:
 
 <<Exemplo de Referência.>>
