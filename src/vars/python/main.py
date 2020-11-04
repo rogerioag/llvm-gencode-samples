@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*
 
 from llvmlite import ir
+from llvmlite import binding as llvm
 
 '''
 Este módulo contém uma função main, declarações de variáveis, operações e atribuições
@@ -24,8 +25,19 @@ int main(){
 
 '''
 
+# Código de Inicialização.
+llvm.initialize()
+llvm.initialize_all_targets()
+llvm.initialize_native_target()
+llvm.initialize_native_asmprinter()
+
 # Cria o módulo.
 module = ir.Module('meu_modulo.bc')
+module.triple = llvm.get_process_triple()
+target = llvm.Target.from_triple(module.triple)
+target_machine = target.create_target_machine()
+module.data_layout = target_machine.target_data
+
 
 # Variável inteira global g
 g = ir.GlobalVariable(module, ir.IntType(32),"g")
@@ -73,7 +85,7 @@ a = builder.alloca(ir.IntType(32), name="a")
 a.align = 4
 # Cria uma constante pra armazenar o numero 1
 num1 = ir.Constant(ir.IntType(32),1)
-# Armazena o 1 na variave 'a'
+# Armazena o 1 na variavel 'a'
 builder.store(num1, a)
 
 # Variavel float b
@@ -88,10 +100,10 @@ builder.store(num1Float, b)
 
 # g = 10
 # Outra maneira de fazer o store (sem precisar criar constante pra armazenar numero)
-builder.store( ir.Constant(ir.IntType(32), 10) , g )
+builder.store(ir.Constant(ir.IntType(32), 10), g)
 
 # h = 10.0
-builder.store( ir.Constant(ir.FloatType(), 10.0) , h )
+builder.store(ir.Constant(ir.FloatType(), 10.0), h)
 
 # a = a + 10
 a_temp = builder.load(a, "")
@@ -103,7 +115,7 @@ builder.store(temp, a)
 # b = b + h
 b_temp = builder.load(b, "")
 h_temp = builder.load(h,"")
-temp2 = builder.fadd( b_temp , h_temp , name='temp2', flags=())
+temp2 = builder.fadd(b_temp , h_temp , name='temp2', flags=())
 # Armazena temp2 em b
 builder.store(temp2, b)
 
@@ -115,10 +127,14 @@ builder.position_at_end(endBasicBlock)
 
 # return 0
 # Cria o return
-returnVal_temp = builder.load(returnVal, name='', align=4)
-builder.ret(returnVal_temp)
+# returnVal_temp = builder.load(returnVal, name='', align=4)
+# builder.ret(returnVal_temp)
+builder.ret(ir.Constant(ir.IntType(32), 0))
 
 arquivo = open('vars.ll', 'w')
 arquivo.write(str(module))
 arquivo.close()
 print(module)
+
+# Shutdown.
+llvm.shutdown()

@@ -1,6 +1,6 @@
 ; ModuleID = "meu_modulo.bc"
-target triple = "unknown-unknown-unknown"
-target datalayout = ""
+target triple = "x86_64-unknown-linux-gnu"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 
 @"g" = common global i32 0, align 4
 @"h" = common global float              0x0, align 4
@@ -24,6 +24,5 @@ entry:
   store float %"temp2", float* %"b"
   br label %"exit"
 exit:
-  %".13" = load i32, i32* %"retorno", align 4
-  ret i32 %".13"
+  ret i32 0
 }

@@ -1,4 +1,4 @@
-CC = clang-3.5
+CC = clang
 
 all: main
 
