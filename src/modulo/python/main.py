@@ -8,6 +8,10 @@ Será gerado um código em LLVM como este em C:
 
 '''
 
+
+
+
+
 # Cria o módulo.
 module = ir.Module('meu_modulo.bc')
 

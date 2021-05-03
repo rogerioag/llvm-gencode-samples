@@ -23,6 +23,11 @@
     - [C](src/vars/C)
     - [Python](src/vars/python)
 
++ [Atribuição](src/atribuicao)
+    - [Ref](src/atribuicao/ref)
+    - [C](src/atribuicao/C)
+    - [Python](src/abribuicao/python)
+
 + [Instruções Lógicas e Aritméticas](src/instrucoes-logicas-aritmeticas)
     - [Ref](src/instrucoes-logicas-aritmeticas/ref)
     - [C](src/instrucoes-logicas-aritmeticas/C)

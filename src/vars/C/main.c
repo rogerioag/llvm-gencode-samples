@@ -5,17 +5,15 @@
 #include <llvm-c/BitWriter.h>
 
 /*
-int g;
-float h;
+int a;
+float b;
 
 int main(){
-  int a = 1;
-  float b = 1.0;
+  int c = 1;
+  float d = 1.0;
   
-  g = 10;
-  h = 10.0;
-  a = a + 10;
-  b = b + h;
+  a = 10;
+  b = 10.0;
   
   return 0;
 }
@@ -26,31 +24,31 @@ int main(int argc, char *argv[]) {
   LLVMModuleRef module = LLVMModuleCreateWithNameInContext("meu_modulo.bc", context);
   LLVMBuilderRef builder = LLVMCreateBuilderInContext(context);
 
-  // int g;
-  // Declaração da variável global g.
+  // int a;
+  // Declaração da variável global a.
   // LLVMValueRef LLVMAddGlobal(LLVMModuleRef M, LLVMTypeRef Ty, const char *Name);
-  LLVMValueRef g = LLVMAddGlobal (module, LLVMIntType(32), "g");
+  LLVMValueRef a = LLVMAddGlobal (module, LLVMIntType(32), "a");
 
   // void LLVMSetInitializer(LLVMValueRef GlobalVar, LLVMValueRef ConstantVal);
-  LLVMSetInitializer(g, LLVMConstInt(LLVMIntType(32), 0, false));
+  LLVMSetInitializer(a, LLVMConstInt(LLVMIntType(32), 0, false));
 
   // common.
-  LLVMSetLinkage(g, LLVMCommonLinkage);
+  LLVMSetLinkage(a, LLVMCommonLinkage);
   // Alignment.
-  LLVMSetAlignment(g, 4);
+  LLVMSetAlignment(a, 4);
 
-  // float h;
-  // Declaração da variável global h.
+  // float b;
+  // Declaração da variável global b.
   // LLVMValueRef LLVMAddGlobal(LLVMModuleRef M, LLVMTypeRef Ty, const char *Name);
-  LLVMValueRef h = LLVMAddGlobal (module, LLVMFloatType(), "h");
+  LLVMValueRef b = LLVMAddGlobal (module, LLVMFloatType(), "b");
 
   // void LLVMSetInitializer(LLVMValueRef GlobalVar, LLVMValueRef ConstantVal);
-  LLVMSetInitializer(h, LLVMConstInt(LLVMFloatType(), 0.0, false));
+  LLVMSetInitializer(b, LLVMConstInt(LLVMFloatType(), 0.0, false));
 
   // common.
-  LLVMSetLinkage(h, LLVMCommonLinkage);
+  LLVMSetLinkage(b, LLVMCommonLinkage);
   // Alignment.
-  LLVMSetAlignment(h, 4);
+  LLVMSetAlignment(b, 4);
 
   // Declara o tipo do retorno da função main.
   LLVMTypeRef mainFnReturnType = LLVMInt32TypeInContext(context);
@@ -63,7 +61,7 @@ int main(int argc, char *argv[]) {
   // Declara o bloco de entrada.
   LLVMBasicBlockRef entryBlock = LLVMAppendBasicBlockInContext(context, mainFn, "entry");
   // Declara o bloco de saída.
-  LLVMBasicBlockRef endBasicBlock = LLVMAppendBasicBlock(mainFn, "end");
+  LLVMBasicBlockRef exitBasicBlock = LLVMAppendBasicBlock(mainFn, "exit");
 
   // Adiciona o bloco de entrada.
   LLVMPositionBuilderAtEnd(builder, entryBlock);
@@ -72,44 +70,33 @@ int main(int argc, char *argv[]) {
   LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMIntType(32), "retorno");
 	
 
-  // int a = 1;
-  // float b = 1.0;
+  // int c = 1;
+  // float d = 1.0;
 
-  // Declaracao da variavel a. 
-  LLVMValueRef a = LLVMBuildAlloca(builder, LLVMIntType(32), "a");
-  LLVMSetAlignment(a, 4);
+  // Declaracao da variavel local c. 
+  LLVMValueRef c = LLVMBuildAlloca(builder, LLVMIntType(32), "c");
+  LLVMSetAlignment(c, 4);
   
-  LLVMValueRef b = LLVMBuildAlloca(builder, LLVMFloatType(), "b");
-  LLVMSetAlignment(b, 4);
+  LLVMValueRef d = LLVMBuildAlloca(builder, LLVMFloatType(), "d");
+  LLVMSetAlignment(d, 4);
 
   // Inicializa as variáveis.
   LLVMBuildStore(builder, Zero32, returnVal);
-  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 1, false), a);
-  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 1.0), b);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 1, false), c);
+  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 1.0), d);
 
 
-  // g = 10;
-  // h = 10.0;
-  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 10, false), g);
+  // a = 10;
+  // b = 10.0;
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 10, false), a);
 
-  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 10.0), h);
+  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 10.0), b);
 
-  // a = a + 10;
-
-  LLVMValueRef temp = LLVMBuildAdd(builder, LLVMBuildLoad(builder, a, ""), LLVMConstInt(LLVMIntType(32), 10, false), "temp");
-  LLVMBuildStore(builder, temp, a);
-
-
-  //b = b + h;
-
-  LLVMValueRef temp2 = LLVMBuildFAdd(builder, LLVMBuildLoad(builder, b, ""), LLVMBuildLoad(builder, h, ""), "temp");
-  LLVMBuildStore(builder, temp2, b);
-  
-    // Cria um salto para o bloco de saída.
-	LLVMBuildBr(builder, endBasicBlock);
+  // Cria um salto para o bloco de saída.
+	LLVMBuildBr(builder, exitBasicBlock);
 	
 	// Adiciona o bloco de saída.
-	LLVMPositionBuilderAtEnd(builder, endBasicBlock);
+	LLVMPositionBuilderAtEnd(builder, exitBasicBlock);
   
   // return 0;
   // Cria o return.
