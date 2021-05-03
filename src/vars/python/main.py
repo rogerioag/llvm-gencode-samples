@@ -2,28 +2,26 @@
 # -*- coding: utf-8 -*
 
 from llvmlite import ir
+from llvmlite import binding as llvm
 
 '''
 Este módulo contém declarações de variáveis, operações e atribuições
 Será gerado um código em LLVM como este em C:
 
-int g;
-float h;
+int a;
+float b;
 
 int main(){
-  int a = 1;
-  float b = 1.0;
+  int c = 1;
+  float d = 1.0;
 
-  g = 10;
-  h = 10.0;
-  a = a + 10;
-  b = b + h;
-
+  a = 10;
+  b = 10.0;
+  
   return 0;
 }
 
 '''
-
 
 def declara_e_atribui(name: str, _type: ir.Type, value) -> ir.AllocaInstr:
     global bloco
@@ -61,51 +59,35 @@ if __name__ == '__main__':
     # Cria o módulo.
     modulo = ir.Module('meu_modulo.bc')
 
-    # Inicializa a variavel g
-    g = declara_global('g', ir.IntType(32), 0)
+    # Inicializa a variavel a
+    a = declara_global('a', ir.IntType(32), 0)
 
-    # Variável float global h
-    h = declara_global('h', ir.FloatType(), 0.0)
+    # Variável float global b
+    b = declara_global('b', ir.FloatType(), 0.0)
 
     # Declaração da função 'principal', que DEVE ser usada com o nome 'main'.
     main_type = ir.FunctionType(ir.IntType(32), [])
     main = ir.Function(modulo, main_type, 'main')
 
     # Cria blocos de entrada e saída
-    bloco_entrada = main.append_basic_block('bloco_entrada')
-    bloco_saida = main.append_basic_block('bloco_saida')
+    bloco_entrada = main.append_basic_block('entry')
+    bloco_saida = main.append_basic_block('exit')
 
     # Entra no bloco de entrada
     bloco = ir.IRBuilder(bloco_entrada)
 
-    # int a = 1;
-    a = declara_e_atribui('a', ir.IntType(32), 1)
+    # int c = 1;
+    c = declara_e_atribui('c', ir.IntType(32), 1)
 
-    # float b = 1.0
-    b = declara_e_atribui('a', ir.FloatType(), 1.0)
+    # float d = 1.0
+    d = declara_e_atribui('d', ir.FloatType(), 1.0)
 
-    # g = 10
+    # a = 10
     # Outra maneira de fazer o store (sem precisar criar constante previamente)
-    bloco.store(ir.Constant(ir.IntType(32), 10), g)
+    bloco.store(ir.Constant(ir.IntType(32), 10), a)
 
-    # h = 10.0
-    bloco.store(ir.Constant(ir.FloatType(), 10.0), h)
-
-    # a = a + 10
-    a_temp = bloco.load(a, align=4)
-    num10 = ir.Constant(ir.IntType(32), 10)
-    temp = bloco.add(a_temp, num10, name='temp')
-
-    # Armazena o temp (a + 10) no a
-    bloco.store(temp, a)
-
-    # b = b + h
-    b_temp = bloco.load(b, align=4)
-    h_temp = bloco.load(h, align=4)
-    temp2 = bloco.fadd(b_temp, h_temp, name='temp2')
-
-    # Armazena temp2 em b
-    bloco.store(temp2, b)
+    # b = 10.0
+    bloco.store(ir.Constant(ir.FloatType(), 10.0), b)
 
     # Salto para bloco de saída
     bloco.branch(bloco_saida)
@@ -121,3 +103,9 @@ if __name__ == '__main__':
 
     with open('vars.ll', 'w') as arquivo:
         arquivo.write(str(modulo))
+
+    arquivo.close()
+    print(module)
+    
+    # Shutdown.
+    llvm.shutdown()

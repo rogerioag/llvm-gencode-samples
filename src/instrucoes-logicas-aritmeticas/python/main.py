@@ -1,91 +1,103 @@
-from llvmlite import ir
+from llvmlite import ir, binding
 
 '''
-Este módulo contém um exemplo de instruções aritméticas/lógicas.
+Este módulo contém uma função main com exemplos de várias operações lógicas e aritméticas.
 Será gerado um código em LLVM como este em C:
 
 int main(){
-    int a = 1;
-    float b = 1.0;
-    float c = 2.0;
-    a = a + a;
-    b = b + c;
+	int x = 2;
+	int y = 1;
+
+	// Operações lógicas
+	int maior = (x > y);
+	int menor = (x < y);
+	int maiorIgual = (x >= y);
+	int menorIgual = (x <= y);
+	int igual = (x == y);
+	int diferente = (x != y);
+	int and = (x & y);
+	int or = (x | y);
+	int not = !x;
+	int xor = (x ^ y);
+
+	// Operações aritméticas
+	int soma = (x + y);
+	int subtracao = (x - y);
+	int multiplicacao = (x * y);
+	int divisao = (x / y);
+	int modulo = (x % y);
+	int shiftDireita = (x >> 1);
+	int shiftEsquerda = (x << 1);
+
     return 0;
 }
 
+
 '''
 
+# Cria o módulo.
+module = ir.Module('meu_modulo.bc')
+module.triple = binding.get_default_triple()
 
-def declara_e_atribui(name: str, _type: ir.Type, value) -> ir.AllocaInstr:
-    global bloco
+main_ftype = ir.FunctionType(ir.IntType(32), ())
+main_func = ir.Function(module, main_ftype, 'main')
 
-    temp = bloco.alloca(_type, name=name)
+entry_block = main_func.append_basic_block('entry');
+exit_block = main_func.append_basic_block('exit');
 
-    # Define o alinhamento de 4 bytes
-    temp.align = 4
+builder = ir.IRBuilder(entry_block)
 
-    # Cria uma constante pra armazenar o valor passado
-    constant = ir.Constant(_type, value)
+return_val = builder.alloca(ir.IntType(32), name='ret_val')
+builder.store(
+    value=ir.Constant(ir.IntType(32), 0),
+    ptr=return_val,
+    align=4
+)
 
-    # Armazena a constante na variável criada
-    bloco.store(constant, temp)
+x = builder.alloca(ir.IntType(32), name='x')
+builder.store(
+    value=ir.Constant(ir.IntType(32), 2),
+    ptr=x,
+    align=4
+)
+y = builder.alloca(ir.IntType(32), name='y')
+builder.store(
+    value=ir.Constant(ir.IntType(32), 1),
+    ptr=y,
+    align=4
+)
 
-    return temp
+x_temp = builder.load(x, name='x_temp')
+y_temp = builder.load(y, name='y_temp')
 
+# Operações lógicas
+builder.icmp_signed('>', x_temp, y_temp, name='maior')
+builder.icmp_signed('<', x_temp, y_temp, name='menor')
+builder.icmp_signed('>=', x_temp, y_temp, name='maiorIgual')
+builder.icmp_signed('<=', x_temp, y_temp, name='menorIgual')
+builder.icmp_signed('==', x_temp, y_temp, name='igual')
+builder.icmp_signed('!=', x_temp, y_temp, name='diferente')
+builder.and_(x_temp, y_temp, name='and')
+builder.or_(x_temp, y_temp, name='or')
+builder.xor(x_temp, y_temp, name='xor')
+builder.not_(x_temp, name='not')
 
-if __name__ == "__main__":
-    # Cria o módulo.
-    modulo = ir.Module('meu_modulo.bc')
+# Operações aritméticas
+builder.add(x_temp, y_temp, name='soma')
+builder.sub(x_temp, y_temp, name='subtracao')
+builder.mul(x_temp, y_temp, name='multiplicacao')
+builder.sdiv(x_temp, y_temp, name='divisao')
+builder.srem(x_temp, y_temp, name='modulo')
+um = ir.Constant(ir.IntType(32), 1)
+builder.ashr(x_temp, um, name='shiftDireita')
+builder.shl(x_temp, um, name='shiftEsquerda')
 
-    # Declaração da função 'principal', que DEVE ser usada com o nome 'main'.
-    main_type = ir.FunctionType(ir.IntType(32), [])
-    main = ir.Function(modulo, main_type, "main")
+builder.branch(exit_block)
+builder.position_at_end(exit_block)
 
-    # Cria blocos de entrada e saída
-    bloco_entrada = main.append_basic_block("bloco_entrada")
-    bloco_saida = main.append_basic_block("bloco_saida")
+builder.ret(builder.load(return_val))
 
-    # Entra no bloco de entrada
-    bloco = ir.IRBuilder(bloco_entrada)
-
-    # int a = 1;
-    a = declara_e_atribui("a", ir.IntType(32), 1)
-
-    # float b = 1.0;
-    b = declara_e_atribui("b", ir.FloatType(), 1.0)
-
-    # float c = 2.0;
-    c = declara_e_atribui("c", ir.FloatType(), 2.0)
-
-    # a = a + a;
-    # Carrega 'a'
-    a_load = bloco.load(a)
-
-    # Efetua adição
-    res = bloco.add(a_load, a_load)
-
-    # Armazena em 'a' o resultado
-    bloco.store(res, a, 4)
-
-    # b = b + c;
-    # Carrega variáveis 'b' e 'c'
-    b_load = bloco.load(b)
-    c_load = bloco.load(c)
-
-    # Efetua adição
-    res = bloco.add(b_load, c_load)
-
-    # Armazena em 'b' o resultado
-    bloco.store(res, b, 4)
-
-    # Entra no bloco de saída
-    bloco = ir.IRBuilder(bloco_saida)
-
-    # Cria constante de retorno
-    retorno = ir.Constant(ir.IntType(32), 0)
-
-    # Efetua o retorno
-    bloco.ret(retorno)
-
-    with open('meu_modulo.ll', 'w') as arquivo:
-        arquivo.write(str(modulo))
+arquivo = open('main.ll', 'w')
+arquivo.write(str(module))
+arquivo.close()
+print(module)

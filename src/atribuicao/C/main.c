@@ -5,15 +5,12 @@
 #include <llvm-c/BitWriter.h>
 
 /*
-int a;
-float b;
+int a,b,c;
 
 int main(){
-  int c = 1;
-  float d = 1.0;
-  
-  a = 10;
-  b = 10.0;
+  a = 1;
+  b = 2;
+  c = a + b;
   
   return 0;
 }
@@ -26,9 +23,8 @@ int main(int argc, char *argv[]) {
 
   // int a;
   // Declaração da variável global a.
-  // LLVMValueRef LLVMAddGlobal(LLVMModuleRef M, LLVMTypeRef Ty, const char *Name);
   LLVMValueRef a = LLVMAddGlobal (module, LLVMIntType(32), "a");
-
+  
   // void LLVMSetInitializer(LLVMValueRef GlobalVar, LLVMValueRef ConstantVal);
   LLVMSetInitializer(a, LLVMConstInt(LLVMIntType(32), 0, false));
 
@@ -37,18 +33,27 @@ int main(int argc, char *argv[]) {
   // Alignment.
   LLVMSetAlignment(a, 4);
 
-  // float b;
   // Declaração da variável global b.
-  // LLVMValueRef LLVMAddGlobal(LLVMModuleRef M, LLVMTypeRef Ty, const char *Name);
-  LLVMValueRef b = LLVMAddGlobal (module, LLVMFloatType(), "b");
-
+  LLVMValueRef b = LLVMAddGlobal (module, LLVMIntType(32), "b");
+  
   // void LLVMSetInitializer(LLVMValueRef GlobalVar, LLVMValueRef ConstantVal);
-  LLVMSetInitializer(b, LLVMConstInt(LLVMFloatType(), 0.0, false));
+  LLVMSetInitializer(b, LLVMConstInt(LLVMIntType(32), 0, false));
 
   // common.
   LLVMSetLinkage(b, LLVMCommonLinkage);
   // Alignment.
   LLVMSetAlignment(b, 4);
+
+  // Declaração da variável global c.
+  LLVMValueRef c = LLVMAddGlobal (module, LLVMIntType(32), "c");
+  
+  // void LLVMSetInitializer(LLVMValueRef GlobalVar, LLVMValueRef ConstantVal);
+  LLVMSetInitializer(c, LLVMConstInt(LLVMIntType(32), 0, false));
+
+  // common.
+  LLVMSetLinkage(c, LLVMCommonLinkage);
+  // Alignment.
+  LLVMSetAlignment(c, 4);
 
   // Declara o tipo do retorno da função main.
   LLVMTypeRef mainFnReturnType = LLVMInt32TypeInContext(context);
@@ -69,28 +74,20 @@ int main(int argc, char *argv[]) {
   // Cria o valor de retorno e inicializa com zero.
   LLVMValueRef returnVal = LLVMBuildAlloca(builder, LLVMIntType(32), "retorno");
 	
-
-  // int c = 1;
-  // float d = 1.0;
-
-  // Declaracao da variavel local c. 
-  LLVMValueRef c = LLVMBuildAlloca(builder, LLVMIntType(32), "c");
-  LLVMSetAlignment(c, 4);
-  
-  LLVMValueRef d = LLVMBuildAlloca(builder, LLVMFloatType(), "d");
-  LLVMSetAlignment(d, 4);
-
+  // a = 1;
+  // b = 2;
   // Inicializa as variáveis.
   LLVMBuildStore(builder, Zero32, returnVal);
-  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 1, false), c);
-  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 1.0), d);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 1, false), a);
+  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 2, false), b);
+   
+  // c = a + b;
 
+  LLVMValueRef temp_a = LLVMBuildLoad(builder, a, "");
+  LLVMValueRef temp_b = LLVMBuildLoad(builder, b, "");
 
-  // a = 10;
-  // b = 10.0;
-  LLVMBuildStore(builder, LLVMConstInt(LLVMIntType(32), 10, false), a);
-
-  LLVMBuildStore(builder, LLVMConstReal(LLVMFloatType(), 10.0), b);
+  LLVMValueRef add_temp = LLVMBuildAdd(builder, temp_a, temp_b, "temp");
+  LLVMBuildStore(builder, add_temp, c);
 
   // Cria um salto para o bloco de saída.
 	LLVMBuildBr(builder, exitBasicBlock);

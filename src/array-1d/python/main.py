@@ -77,8 +77,6 @@ elem_A_49 = builder.load(ptr_A_49, name='', align=4)
 
 # temp = builder.add(elem_A_49, 5, name='', flags=())
 
-
-
 # Cria um salto para o bloco de saída.
 builder.branch(endBasicBlock);
 

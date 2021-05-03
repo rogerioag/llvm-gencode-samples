@@ -1,21 +1,22 @@
-; ModuleID = 'vars.c'
-source_filename = "vars.c"
+; ModuleID = 'atribuicao.c'
+source_filename = "atribuicao.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
 @a = dso_local global i32 0, align 4
-@b = dso_local global float 0.000000e+00, align 4
+@b = dso_local global i32 0, align 4
+@c = dso_local global i32 0, align 4
 
 ; Function Attrs: noinline nounwind optnone sspstrong uwtable
 define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca float, align 4
   store i32 0, i32* %1, align 4
-  store i32 1, i32* %2, align 4
-  store float 1.000000e+00, float* %3, align 4
-  store i32 10, i32* @a, align 4
-  store float 1.000000e+01, float* @b, align 4
+  store i32 1, i32* @a, align 4
+  store i32 2, i32* @b, align 4
+  %2 = load i32, i32* @a, align 4
+  %3 = load i32, i32* @b, align 4
+  %4 = add nsw i32 %2, %3
+  store i32 %4, i32* @c, align 4
   ret i32 0
 }
 

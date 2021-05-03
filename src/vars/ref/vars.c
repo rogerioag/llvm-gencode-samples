@@ -1,14 +1,12 @@
-int g;
-float h;
+int a;
+float b;
 
 int main(){
-	int a = 1;
-	float b = 1.0;
-	
-	g = 10;
-	h = 10.0;
-	a = a + 10;
-	b = b + h;
-	
-	return 0;
+  int c = 1;
+  float d = 1.0;
+  
+  a = 10;
+  b = 10.0;
+  
+  return 0;
 }
