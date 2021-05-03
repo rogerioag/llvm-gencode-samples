@@ -76,6 +76,9 @@ if __name__ == '__main__':
     # Entra no bloco de entrada
     bloco = ir.IRBuilder(bloco_entrada)
 
+    # Cria o valor de retorno e inicializa com zero
+    retorno = declara_e_atribui('retorno', ir.IntType(32), 0)
+
     # int c = 1;
     c = declara_e_atribui('c', ir.IntType(32), 1)
 
@@ -105,7 +108,7 @@ if __name__ == '__main__':
         arquivo.write(str(modulo))
 
     arquivo.close()
-    print(module)
+    print(modulo)
     
     # Shutdown.
     llvm.shutdown()
