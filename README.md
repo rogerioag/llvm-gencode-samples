@@ -13,6 +13,11 @@
     - [C](src/modulo/C)
     - [Python](src/modulo/python)
 
++ [Declarando a Função `main`](src/funcao-main)
+    - [Ref](src/funcao-main/ref)
+    - [C](src/funcao-main/C)
+    - [Python](src/funcao-main/python)
+
 + [Hello World](src/hello)
     - [Ref](src/hello/ref)
     - [C](src/hello/C)
@@ -97,11 +102,6 @@
     - [Ref](src/repeat-until/ref)
     - [C](src/repeat-until/C)
     - [Python](src/repeat-until/python)
-
-+ [Função](src/funcao)
-    - [Ref](src/funcao/ref)
-    - [C](src/funcao/C)
-    - [Python](src/funcao/python)
 
 + [Scanf](src/scanf)
     - [Ref](src/scanf/ref)
