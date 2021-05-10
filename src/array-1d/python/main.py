@@ -25,7 +25,7 @@ module = ir.Module('meu_modulo.bc')
 typeA = ir.ArrayType(ir.IntType(64), 1024)
 
 arrayA = ir.GlobalVariable(module, typeA, "A")
-arrayA.initializer = ir.Constant.array(ir.IntType(64), 0)
+# arrayA.initializer = ir.Constant(ir.ArrayType(ir.IntType(64), 1024), 0)
 
 # arrayA.initializer = ir.IntType(64)
 arrayA.linkage = "common"
@@ -75,7 +75,12 @@ ptr_A_49 = builder.gep(arrayA, [int_ty(0), int_ty(49)], name='ptr_A_49')
 
 elem_A_49 = builder.load(ptr_A_49, name='', align=4)
 
-# temp = builder.add(elem_A_49, 5, name='', flags=())
+temp_add = builder.add(elem_A_49, int_ty(5), name='', flags=())
+
+# Armazena no A[50].
+ptr_A_50 = builder.gep(arrayA, [int_ty(0), int_ty(50)], name='ptr_A_50')
+
+builder.store(temp_add, ptr_A_50)
 
 # Cria um salto para o bloco de saída.
 builder.branch(endBasicBlock);

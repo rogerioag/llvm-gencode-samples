@@ -1,3 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*
+
+from llvmlite import ir
+from llvmlite import binding as llvm
+
+'''
+Este módulo contém declarações de variáveis, operações e atribuições
+Será gerado um código em LLVM como este em C:
+
+int a;
+float b;
+
+int main(){
+  int c = 1;
+  float d = 1.0;
+
+  a = 10;
+  b = 10.0;
+  
+  return 0;
+}
+
+'''
+
+
 # Código de Inicialização.
 llvm.initialize()
 llvm.initialize_all_targets()
