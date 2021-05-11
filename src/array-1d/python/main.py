@@ -22,21 +22,21 @@ int main(){
 module = ir.Module('meu_modulo.bc')
 
 # Array global de 1024 elementos.
-typeA = ir.ArrayType(ir.IntType(64), 1024)
+typeA = ir.ArrayType(ir.IntType(32), 1024)
 
 arrayA = ir.GlobalVariable(module, typeA, "A")
 # arrayA.initializer = ir.Constant(ir.ArrayType(ir.IntType(64), 1024), 0)
 
-# arrayA.initializer = ir.IntType(64)
 arrayA.linkage = "common"
-# arrayA.initializer = ir.Constant(ir.IntType(64), 0)
-arrayA.align = 16
+
+arrayA.initializer = ir.Constant(typeA, None)
+arrayA.align = 4
 
 # Cria um valor zero para colocar no retorno.
-Zero64 = ir.Constant(ir.IntType(64), 0)
+Zero64 = ir.Constant(ir.IntType(32), 0)
 
 # Declara o tipo do retorno da função main.
-mainFnReturnType = ir.IntType(64)
+mainFnReturnType = ir.IntType(32)
 # Cria a função main.
 t_func_main = ir.FunctionType(mainFnReturnType, ())
 
@@ -51,14 +51,14 @@ endBasicBlock = main.append_basic_block('exit')
 builder = ir.IRBuilder(entryBlock)
 
 # Cria o valor de retorno e inicializa com zero.
-returnVal = builder.alloca(ir.IntType(64), name='retorno')
+returnVal = builder.alloca(ir.IntType(32), name='retorno')
 builder.store(Zero64, returnVal)
 
 # Array local de 1024 elementos.
-typeB = ir.ArrayType(ir.IntType(64), 1024)
+typeB = ir.ArrayType(ir.IntType(32), 1024)
 
 arrayB = builder.alloca(typeB, name='B')
-arrayB.align = 16
+arrayB.align = 4
 
 
 # A[50] = A[49] + 5;
@@ -67,7 +67,7 @@ arrayB.align = 16
 
 #indices = [ir.Constant(ir.IntType(64), 0), ir.Constant(ir.IntType(64), 49)]
 
-int_ty = ir.IntType(64)
+int_ty = ir.IntType(32)
 
 ptr_A_49 = builder.gep(arrayA, [int_ty(0), int_ty(49)], name='ptr_A_49')
 

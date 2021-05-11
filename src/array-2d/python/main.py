@@ -24,22 +24,19 @@ int main(){
 module = ir.Module('meu_modulo.bc')
 
 # Array global de 2048 x 2048 elementos.
-typeB_0 = ir.ArrayType(ir.IntType(64), 2048)
+typeB_0 = ir.ArrayType(ir.IntType(32), 2048)
 typeB = ir.ArrayType(typeB_0, 2048)
 
 arrayB = ir.GlobalVariable(module, typeB, "B")
-# arrayB.initializer = ir.Constant.array(ir.IntType(64), 0)
-
-# arrayA.initializer = ir.IntType(64)
 arrayB.linkage = "common"
-# arrayA.initializer = ir.Constant(ir.IntType(64), 0)
-arrayB.align = 16
+arrayB.initializer = ir.Constant(typeB, None)
+arrayB.align = 4
 
 # Cria um valor zero para colocar no retorno.
-Zero64 = ir.Constant(ir.IntType(64), 0)
+Zero64 = ir.Constant(ir.IntType(32), 0)
 
 # Declara o tipo do retorno da função main.
-mainFnReturnType = ir.IntType(64)
+mainFnReturnType = ir.IntType(32)
 # Cria a função main.
 t_func_main = ir.FunctionType(mainFnReturnType, ())
 
@@ -54,22 +51,22 @@ exitBasicBlock = main.append_basic_block('exit')
 builder = ir.IRBuilder(entryBlock)
 
 # Cria o valor de retorno e inicializa com zero.
-returnVal = builder.alloca(ir.IntType(64), name='retorno')
+returnVal = builder.alloca(ir.IntType(32), name='retorno')
 builder.store(Zero64, returnVal)
 
 # Array local de 2048 x 2048 elementos.
-typeD_0 = ir.ArrayType(ir.IntType(64), 2048)
+typeD_0 = ir.ArrayType(ir.IntType(32), 2048)
 typeD = ir.ArrayType(typeD_0, 2048)
 
 arrayD = builder.alloca(typeD, name='D')
-arrayD.align = 16
+arrayD.align = 4
 
 
 # B[0][1] = B[1][1] + 10;
 # D[0][1] = D[1][1] + 10
 # Na documentação diz para usar um indice a mais, o primeiro em zero: http: // releases.llvm.org/2.3/docs/GetElementPtr.html  # extra_index
 # The first index, i64 0 is required to step over the global variable % MyStruct. Since the first argument to the GEP instruction must always be a value of pointer type, the first index steps through that pointer. A value of 0 means 0 elements offset from that pointer.
-int_ty = ir.IntType(64)
+int_ty = ir.IntType(32)
 
 ptr_B_1_1 = builder.gep(arrayB, [int_ty(0), int_ty(1), int_ty(1)], name='ptr_B_1_1')
 
@@ -97,7 +94,6 @@ ptr_D_0_1 = builder.gep(
     arrayD, [int_ty(0), int_ty(0), int_ty(1)], name='ptr_D_0_1')
 
 builder.store(add_temp2, ptr_D_0_1)
-
 
 # Cria um salto para o bloco de saída.
 builder.branch(exitBasicBlock)
