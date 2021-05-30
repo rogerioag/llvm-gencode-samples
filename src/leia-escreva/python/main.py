@@ -7,7 +7,7 @@ Será gerado um código em LLVM como este em C:
 int main() {
     int a;
 
-    a = scanf("%d", &a);
+    scanf("%d", &a);
     printf("%d", a);
     
     return 0;
