@@ -9,13 +9,13 @@ Este módulo contém uma função main, declarações de variáveis, operações
 Será gerado um código em LLVM como este em C:
 
 int a,b,c;
+a := 10
 
 int main(){
-  a = 1;
   b = 2;
   c = a + b;
   
-  return 0;
+  return c;
 }
 
 '''
@@ -33,13 +33,13 @@ target = llvm.Target.from_triple(module.triple)
 target_machine = target.create_target_machine()
 module.data_layout = target_machine.target_data
 
-
 # Variável inteira global a
 a = ir.GlobalVariable(module, ir.IntType(32),"a")
-# Inicializa a variavel a
-a.initializer = ir.Constant(ir.IntType(32), 0)
-# Linkage = common
-a.linkage = "common"
+# Inicializa a variavel a:=10
+a.initializer = ir.Constant(ir.IntType(32), 10)
+# a.linkage = "common"
+# inicialização de variável global precisa ser dso_local.
+a.linkage = "dso_local"  
 # Define o alinhamento em 4
 a.align = 4
 
@@ -79,13 +79,13 @@ builder = ir.IRBuilder(entryBlock)
 returnVal = builder.alloca(ir.IntType(32), name='retorno')
 builder.store(Zero32, returnVal)
 
-# a = 1;
+## a = 1;
 
-# Variável inteira 'a'
-# Cria uma constante pra armazenar o numero 1
-num1 = ir.Constant(ir.IntType(32),1)
-# Armazena o 1 na variavel 'a'
-builder.store(num1, a)
+## Variável inteira 'a'
+## Cria uma constante pra armazenar o numero 1
+#num1 = ir.Constant(ir.IntType(32),1)
+## Armazena o 1 na variavel 'a'
+#builder.store(num1, a)
 
 # b = 2;
 # Outra maneira de fazer o store (sem precisar criar constante pra armazenar numero)
@@ -109,8 +109,10 @@ builder.position_at_end(exitBasicBlock)
 # returnVal_temp = builder.load(returnVal, name='', align=4)
 # builder.ret(returnVal_temp)
 
-# return 0.
-builder.ret(ir.Constant(ir.IntType(32), 0))
+# return 0;
+# builder.ret(ir.Constant(ir.IntType(32), 0))
+# return c;
+builder.ret(builder.load(c, ""))
 
 # Se quisessemos retornar o valor de 'c'.
 # returnVal_temp = builder.load(c, name='', align=4)
