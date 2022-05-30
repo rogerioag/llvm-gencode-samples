@@ -31,7 +31,7 @@
 + [Atribuição](src/atribuicao)
     - [Ref](src/atribuicao/ref)
     - [C](src/atribuicao/C)
-    - [Python](src/abribuicao/python)
+    - [Python](src/atribuicao/python)
 
 + [Instruções Lógicas e Aritméticas](src/instrucoes-logicas-aritmeticas)
     - [Ref](src/instrucoes-logicas-aritmeticas/ref)
