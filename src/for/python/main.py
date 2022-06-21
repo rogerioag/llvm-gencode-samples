@@ -1,7 +1,7 @@
 from llvmlite import ir
 
 '''
-Este módulo contém uma função main e criação de um array unidimensional como variável global e outro como local.
+Este módulo contém uma função main no qual executa um "for".
 Será gerado um código em LLVM como este em C:
 
 int main(){
@@ -26,7 +26,7 @@ def declara_e_atribui(name: str, _type: ir.Type, value) -> ir.AllocaInstr:
 
     temp = bloco.alloca(_type, name=name)
 
-    # Define o alinhamento de 4 bytes
+    # Alinhamento de 4 bytes
     temp.align = 4
 
     # Cria uma constante pra armazenar o valor passado
@@ -55,14 +55,11 @@ def incrementa_var(var, value: int):
 
 
 def main():
+    global bloco
     # Cria o módulo.
     modulo = ir.Module('meu_modulo.bc')
 
-    # Declaração das funções que serão 'adicionadas' em tempo de vinculação.
-    _escrevaI = ir.FunctionType(ir.VoidType(), [ir.IntType(32)])
-    escrevaI = ir.Function(modulo, _escrevaI, "escrevaInteiro")
-
-    # Declaração da função 'principal', que DEVE ser usada com o nome 'main'.
+    # Declaração da função 'main'.
     main_type = ir.FunctionType(ir.IntType(32), [])
     main = ir.Function(modulo, main_type, "main")
 
@@ -70,50 +67,58 @@ def main():
     bloco_entrada = main.append_basic_block("bloco_entrada")
     bloco_saida = main.append_basic_block("bloco_saida")
 
-    global bloco
-    # Entra no bloco de entrada
+    # Acessa o bloco de entrada
     bloco = ir.IRBuilder(bloco_entrada)
 
-    # int i = 1
-    i = declara_e_atribui("i", ir.IntType(32), 1)
+    # int i = 0
+    i = declara_e_atribui("i", ir.IntType(32), 0)
+    # int a = 1
+    a = declara_e_atribui("a", ir.IntType(32), 0)
 
-    # Cria blocos para validar a condição e de execução, caso seja válida a expressão
-    bloco_valida_for = main.append_basic_block("valida_for")
+    # Cria blocos de condição, execução avaliando a expressão dada, e finalização
+    bloco_condicao_for = main.append_basic_block("condicao_for")
     bloco_exec_for = main.append_basic_block("executa_for")
+    bloco_final_for = main.append_basic_block("final_for")
 
-    # Salta do bloco principal para o bloco de validação da expressão
-    bloco.branch(bloco_valida_for)
+    # Salta do bloco principal para o bloco de condição do for
+    bloco.branch(bloco_condicao_for)
 
-    # Entra no bloco de validação
-    bloco = ir.IRBuilder(bloco_valida_for)
+    # Entra no bloco de condição
+    bloco = ir.IRBuilder(bloco_condicao_for)
 
-    # Faz a comparação de i < 11
-    comparacao = bloco.icmp_signed("<", bloco.load(i),
-                                   ir.Constant(ir.IntType(32), 11))
+    # Faz a comparação de i < 1024
+    comparacao = bloco.icmp_signed("<", bloco.load(i), ir.Constant(ir.IntType(32), 1024))
 
-    # Salto condicional, se verdade salta para o bloco de execução, salta para o bloco de saída
-    bloco.cbranch(comparacao, bloco_exec_for, bloco_saida)
+    # Salto para o bloco de execução caso a condição for verdadeira, ou de saída se falso
+    bloco.cbranch(comparacao, bloco_exec_for, bloco_final_for)
 
     # Entra no bloco de execução
     bloco = ir.IRBuilder(bloco_exec_for)
-
-    # printf("%d", i);
-    bloco.call(escrevaI, args=[bloco.load(i)])
-
+    #carrega i
+    i_temp = bloco.load(i, "")
+    # Armazena o i em a
+    bloco.store(i_temp, a)
     # i++
     incrementa_var(i, 1)
 
-    # Salta para o bloco de validação (loop)
-    bloco.branch(bloco_valida_for)
+    # Salta para o bloco de condição (loop)
+    bloco.branch(bloco_condicao_for)
 
-    # Entra no bloco de saída
-    bloco = ir.IRBuilder(bloco_saida)
+    # Salta para o bloco de saída do for
+    bloco = ir.IRBuilder(bloco_final_for)
 
     # return 0;
     bloco.ret(ir.Constant(ir.IntType(32), 0))
 
-    with open('for.ll', 'w') as arquivo:
-        arquivo.write(str(modulo))
+    # Entra no bloco de saída 
+    bloco = ir.IRBuilder(bloco_saida) 
+
+    bloco.position_at_end(bloco_saida)
+
+    arquivo = open('for.ll', 'w')
+    arquivo.write(str(modulo))
+    arquivo.close()
+    print(modulo)
 
 if __name__ == "__main__":
     main()
