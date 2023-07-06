@@ -81,6 +81,10 @@ São apresentadas implementações seguindo a nomenclatura:
     - [C](src/if-2/C)
     - [Python](src/if-2/python)
 
++ [If 3](src/if-3)
+    - [Ref](scr/if-3/ref)
+    - [Python](src/if-3/python)
+
 + [Phi](src/phi)
     - [Ref](src/phi/ref)
     - [C](src/phi/C)
