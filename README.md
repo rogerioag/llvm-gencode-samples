@@ -63,6 +63,10 @@ Os exemplos estão organizados em ordem crescente de dificuldade:
     - [C](src/if-2/C)
     - [Python](src/if-2/python)
 
++ [Comando de Seleção: If 3](src/if-3)
+    - [Ref](scr/if-3/ref)
+    - [Python](src/if-3/python)
+
 + [Comando de Seleção: Phi](src/phi)
     - [Ref](src/phi/ref)
     - [C](src/phi/C)
