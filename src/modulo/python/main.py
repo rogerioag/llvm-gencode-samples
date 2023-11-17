@@ -1,12 +1,7 @@
 from llvmlite import ir
+from llvmlite import binding as llvm
 
-'''
-Este módulo contém uma função main e criação de um array unidimensional como variável global e outro como local.
-Será gerado um código em LLVM como este em C:
-
-<<Colocar o Código do Exemplo de Referência.>>
-
-'''
+#Código de exemplo para criação do módulo para os códigos.
 
 # Código de Inicialização.
 llvm.initialize()
@@ -27,3 +22,6 @@ arquivo = open('meu_modulo.ll', 'w')
 arquivo.write(str(module))
 arquivo.close()
 print(module)
+
+#Esse código não será executado pois não possui função main, mas 
+#Esse código é necessário para a inicialização de todo código feito com o llvmlite.
