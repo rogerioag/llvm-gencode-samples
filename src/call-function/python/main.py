@@ -40,7 +40,7 @@ module.data_layout = target_machine.target_data
 # Cria o cabeçalho da função soma
 t_soma = ir.FunctionType(ir.IntType(32), [ir.IntType(32), ir.IntType(32)])
 soma = ir.Function(module, t_soma, 'soma')
-soma.args[0].name = 'a' #Esses nomes atribuidos são os mesmos nomes usados na declaração das variaveis usadas, ver linhas 82 e 86
+soma.args[0].name = 'a' #Esses nomes atribuidos são os mesmos nomes usados na declaração das variaveis usadas, ver linhas 96 e 100
 soma.args[1].name = 'b'
 
 # Cria os blocos de entrada e saidaa da função soma
