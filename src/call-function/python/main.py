@@ -26,7 +26,7 @@ int main(){
 }
 '''
 
-# Cria o módulo e faz inifialização do llvm.
+# Cria o módulo e faz inicialização do llvm.
 llvm.initialize()
 llvm.initialize_all_targets()
 llvm.initialize_native_target()
