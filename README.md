@@ -103,6 +103,11 @@ Os exemplos estão organizados em ordem crescente de dificuldade:
     - [C](src/call-function/C)
     - [Python](src/call-function/python)
 
++ [Chamada de Funções Aninhadas: Nested Call Functions](src/nested-call-function)
+    - [Ref](src/nested-call-function/ref)
+    - [C](src/nested-call-function/C)
+    - [Python](src/nested-call-function/python)
+
 + [Chamada de Função Externa: Call External Function](src/call-external-function)
     - [Ref](src/call-external-function/ref)
     - [C](src/call-external-function/C)
